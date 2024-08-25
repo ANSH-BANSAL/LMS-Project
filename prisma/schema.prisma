@@ -1,11 +1,30 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
   relationMode = "prisma"
+}
+
+enum MemberRole {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+model Profile {
+  id String @id @default(uuid())
+  userId String @unique
+  name String
+  imageUrl String?  
+  email String  
+
+  role MemberRole @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Course {
@@ -22,12 +41,13 @@ model Course {
 
   attachments Attachment[]
   chapters Chapter[]
-  purchases Purchase[]
+  purchases   Purchase[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([categoryId]) 
+  @@fulltext([title])
 }
 
 model Chapter {
